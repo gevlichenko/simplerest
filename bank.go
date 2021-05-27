@@ -31,6 +31,7 @@ func (bank *Bank) CreateAccount(firstName string, lastName string, balance float
 func (bank *Bank) GetBalanceById(id uint) (float64, error) {
 	bank.mutex.RLock()
 	if val, ok := bank.accounts[id]; ok {
+		bank.mutex.RUnlock()
 		return val.GetBalance(), nil
 	}
 	bank.mutex.RUnlock()
@@ -41,14 +42,19 @@ func (bank *Bank) MoveCash(senderId, recipientId uint, amount float64) error {
 	var ok bool
 	bank.mutex.RLock()
 	if sender, ok = bank.accounts[senderId]; !ok {
+		bank.mutex.RUnlock()
 		return errors.New("sender id isn't valid")
 	}
 	if recipient, ok = bank.accounts[recipientId]; !ok {
+		bank.mutex.RUnlock()
 		return errors.New("recipient id isn't valid")
 	}
 	sender.Lock()
 	recipient.Lock()
 	if amount > sender.GetBalance() {
+		recipient.Unlock()
+		sender.Unlock()
+		bank.mutex.RUnlock()
 		return errors.New("balance too low")
 	}
 	sender.SetBalance(sender.GetBalance() - amount)
