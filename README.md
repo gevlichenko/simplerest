@@ -3,4 +3,4 @@
 # Get balance
 ``curl -v http://localhost:8080/account/{id}/balance``
 # Move cash
-``curl -v --header "Content-Type: application/json" --request PUT --data '{"sender_id":1,"recipient_id":2, "Amount": 50}' http://localhost:8080/paymentHandler``
+``curl -v --header "Content-Type: application/json" --request PUT --data '{"sender_id":1,"recipient_id":2, "Amount": 50}' http://localhost:8080/payment``
